@@ -1,0 +1,126 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta name="viewport" content="width=320; user-scalable=no" />
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>Minimal AppLaud App</title>
+
+	  <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+	  <script type="text/javascript" charset="utf-8" src="webSocket.js"></script>
+	  <script type="text/javascript" charset="utf-8" src="Scripts/jquery-1.8.3.js"></script>
+    <script type="text/javascript" charset="utf-8"   src="Scripts/jquery.signalR-1.0.1.js"></script>
+    <script src="http://s.choichung.vn:8080/signalR/hubs"></script>
+    
+	  <script type="text/javascript" charset="utf-8">
+      
+   var wsUri = "ws://s.choichung.vn:8080/signalr/connect?transport=webSockets&connectionToken=AQAAANCMnd8BFdERjHoAwE%2FCl%2BsBAAAAtAVBRrQDakuXs8yXaAVN2AAAAAACAAAAAAAQZgAAAAEAACAAAADzibZnUDfc0clbZLnClIESGzsg8Tm0zByXIsMJIDofmwAAAAAOgAAAAAIAACAAAACqQ%2FdCPeCbKp2zckXabA6iSpMy6x9Jvh1lwjDIilttQDAAAACR0YK%2BovROBz0539EjZm5W8i1s6902Hi%2Fv6GuPdTbG8mA9KiUamRw5J2GmAcFdHUhAAAAA5mYF8ysId8cMb0kV5g3KI3RmoD0ck%2BgIZognZuPaYtQECECCfnVcfajC3ACZ9O5DLELVQ8j4E8Eg7j2%2BnlSCFQ%3D%3D&connectionData=%5B%7B%22name%22%3A%22chat%22%7D%5D&tid=1";
+    var output;
+      
+        var onDeviceReady = function() {
+            document.getElementById("devready").innerHTML = "OnDeviceReady fired.";
+               output = document.getElementById("output");
+    	//	 testWebSocket();
+		
+		
+		
+		
+    	  var chat = $.connection.chat;
+
+            chat.client.send = function (message) {
+                $('#message').append('<li>' + message + '</li>');
+              //  $('#message').innerHTML  =  message ;  
+            };
+
+            // Turn logging on so we can see the calls in the browser console
+            $.connection.hub.logging = true;
+
+            // Change the hub url to point to the remote server
+            $.connection.hub.url = 'http://s.choichung.vn:8080/signalr';
+            $.connection.hub.start().done(function () {
+                $('#send').click(function () {
+                    chat.server.send($('#msg').val());
+                });
+            });
+        };
+
+        function init() {
+            document.addEventListener("deviceready", onDeviceReady, true);
+        } 
+        
+ function testWebSocket() {
+  
+     websocket = new WebSocket(wsUri);
+	 console.log("new WebSocket" + wsUri );
+
+     websocket.onopen = function (evt) {
+	  console.log("websocket.onopen"  );
+         onOpen(evt)
+     };
+     websocket.onclose = function (evt) {
+	 console.log("websocket.onclose"  );
+         onClose(evt)
+     };
+     websocket.onmessage = function (evt) {
+	//  console.log("websocket.onmessage"  );
+	  console.log(evt);  // hello
+         onMessage(evt);
+     };
+     websocket.onerror = function (evt) {
+	  console.log("websocket.onerror"  );
+         onError(evt)
+     };
+	 
+ 
+ }
+
+ function onOpen(evt) {
+     writeToScreen("CONNECTED");
+    // doSend("WebSocket rocks");
+ }
+
+ function onClose(evt) {
+     writeToScreen("DISCONNECTED");
+ }
+
+ function onMessage(evt) {
+     writeToScreen('<span style="color: blue;">RESPONSE: ' + evt + '</span>');
+   //  websocket.close();
+ }
+
+ function onError(evt) {
+     writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
+ }
+
+ function doSend(message) {
+     writeToScreen("SENT: " + message);
+     websocket.send(message);
+ }
+
+ function writeToScreen(message) {
+     var pre = document.createElement("p");
+     pre.style.wordWrap = "break-word";
+     pre.innerHTML = message;
+  //   output.appendChild(pre);
+  output.innerHTML = message; 
+ }
+   
+</script>  
+
+  </head>
+  <body onload="init();" id="stage" class="theme">
+    <h2>Minimal AppLaud App</h2>
+
+	<p>Your app goes here.</p>
+	<p>
+    <span id="devready">onDeviceReady not fired.</span>
+    </p>
+  
+<h2>WebSocket Test</h2>
+<div id="output"></div>
+   <input type="text" id="msg" value=" " />
+    <input type="button" id="send" value="send" />
+    <ul id="message">
+    </ul>
+    
+  </body>
+</html>
